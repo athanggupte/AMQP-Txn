@@ -1,0 +1,9 @@
+version: "3.9"
+services:
+  txn_server:
+    build:
+      context: .
+      dockerfile: Dockerfile-server
+      cache_from:
+        - openjdk:8-jre-alpine3.9
+    image: amqp_txn_server:latest
