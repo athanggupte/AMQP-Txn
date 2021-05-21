@@ -12,19 +12,45 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.AMQP.BasicProperties;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.util.HashSet;
 
 public class TxnClient implements AutoCloseable {
     
     private Connection connection;
     private Channel channel;
     private String requestQueue = "txn";
-
+    public static String getElementRandom(Set<? extends Object> set) {
+        int size = set.size();
+        int item = new Random().nextInt(size);
+        int i = 0;
+        for (Object entry:set) {
+            if (i == item) return (String) entry;
+            i++;
+        }
+        return "??";
+    }
     public static void main(String[] args) throws IOException, TimeoutException, InterruptedException {
+
         ConnectionInfo connectionInfo = new ConnectionInfo();
         Random random = new Random();
+        HashSet<String> typeOfTran = new HashSet<String>();
+        typeOfTran.add("42 Cash Withdrawal");
+        typeOfTran.add("50 Cash Deposit ONUS");
+        typeOfTran.add("32 Cash Deposit OFFUS");
+        typeOfTran.add("41 Balance Enquiry");
+        String string_type_of_trans = getElementRandom(typeOfTran);
         while (true) {
             try(TxnClient txnClient = new TxnClient(connectionInfo)) {
-                String response = txnClient.requestTxn("{ ts: " + new SimpleDateFormat("MMddHHmmss").format(new Date()) + "}");
+                String jsonPayload = "{ 'ts':'" + new SimpleDateFormat("MMddHHmmss").format(new Date()) +
+                        "' , 'Type of Transaction':'" + string_type_of_trans+"'";
+                if(!string_type_of_trans.equals("41 Balance Enquiry")){
+                    Random random1 = new Random();
+                    jsonPayload += ", 'Amount':'" + String.format("%06d" , random1.nextInt(10000)) +"'";
+                }
+                jsonPayload += "}";
+                String response = txnClient.requestTxn(jsonPayload);
                 System.out.println(" [.] Got `" + response + "`");
             }
             Thread.sleep(random.nextInt(4000)+1000);
