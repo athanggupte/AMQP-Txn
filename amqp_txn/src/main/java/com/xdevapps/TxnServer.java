@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -77,7 +79,13 @@ public class TxnServer implements AutoCloseable {
 
     private String getResponse(String request) throws InterruptedException {
         Thread.sleep(1500);
-        return "{ success: \"OK\" }";
+        Gson gson = new GsonBuilder().setDateFormat("MMddHHmmss").create();
+        TxnRequestPayload requestPayload = gson.fromJson(request, TxnRequestPayload.class);
+        
+        /* TODO: Process request */
+        TxnResponsePayload responsePayload = new TxnResponsePayload(requestPayload.getTxnId(), requestPayload.getTimestamp(), true, "");
+        
+        return gson.toJson(responsePayload);
     }
 
     @Override

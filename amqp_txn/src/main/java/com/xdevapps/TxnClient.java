@@ -2,12 +2,13 @@ package com.xdevapps;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeoutException;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -22,9 +23,16 @@ public class TxnClient implements AutoCloseable {
     public static void main(String[] args) throws IOException, TimeoutException, InterruptedException {
         ConnectionInfo connectionInfo = new ConnectionInfo();
         Random random = new Random();
+        Gson gson = new GsonBuilder().setDateFormat("MMddHHmmss").create();
+
         while (true) {
             try(TxnClient txnClient = new TxnClient(connectionInfo)) {
-                String response = txnClient.requestTxn("{ ts: " + new SimpleDateFormat("MMddHHmmss").format(new Date()) + "}");
+                TxnRequestPayload payload = new TxnRequestPayload(UUID.randomUUID().toString(), new Date(), 42, 1000);
+                String payloadString = gson.toJson(payload);
+
+                System.out.println(payloadString);
+
+                String response = txnClient.requestTxn(payloadString);
                 System.out.println(" [.] Got `" + response + "`");
             }
             Thread.sleep(random.nextInt(4000)+1000);
