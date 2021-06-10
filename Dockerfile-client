@@ -6,6 +6,7 @@ COPY amqp_txn/target/amqp_txn-1.0.0.jar /amqp_txn.jar
 COPY amqp_txn/target/dependency/amqp-client-5.12.0.jar /amqp-client-5.12.0.jar
 COPY amqp_txn/target/dependency/slf4j-api-1.7.30.jar /slf4j-api-1.7.30.jar
 COPY amqp_txn/target/dependency/slf4j-simple-1.7.30.jar /slf4j-simple-1.7.30.jar
+COPY amqp_txn/target/dependency/gson-2.8.5.jar /gson-2.8.5.jar
  
 # set the startup command to execute the jar
-CMD ["java", "-cp", "amqp_txn.jar:amqp-client-5.12.0.jar:slf4j-api-1.7.30.jar:slf4j-simple-1.7.30.jar", "com.xdevapps.TxnClient"]
+CMD ["java", "-cp", "amqp_txn.jar:amqp-client-5.12.0.jar:slf4j-api-1.7.30.jar:slf4j-simple-1.7.30.jar:gson-2.8.5.jar", "com.xdevapps.TxnClient"]
